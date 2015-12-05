@@ -29,7 +29,7 @@ namespace Minisat {
   
   void Cooperation::exportExtraUnit(Solver* s, Lit unit){
     
-    int id = s->threadId;
+    int id = s->threadId; /* Current (this) solver thread */
     
     for(int t = 0; t < nbThreads; t++){
       

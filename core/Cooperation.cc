@@ -24,7 +24,7 @@ namespace Minisat {
   /*_________________________________________________________________________________________________
     |
     |  exportExtraUnit : ()  ->  [void]
-    |  Description : manage export Extra Unit Clauses 
+    |  Description : manage export Extra Unit Clauses. Called from Determanager.h 
     |________________________________________________________________________________________________@*/
   
   void Cooperation::exportExtraUnit(Solver* s, Lit unit){
@@ -38,7 +38,7 @@ namespace Minisat {
       if(((ind+1)%MAX_EXTRA_UNITS) == headExtraUnits[id][t]) continue;
       
       extraUnits[id][t][ind++].x = unit.x;
-      
+      //XX:MPI_PUSH
       if(ind == MAX_EXTRA_UNITS) ind = 0;
       tailExtraUnits[id][t] = ind;
     }
@@ -220,30 +220,36 @@ namespace Minisat {
     int id = s->threadId;
     
     for(int t = 0; t < nbThreads; t++){
-      
+      /* XXX MPI_PULL from the main MPI thread.  */
       if(t == id) 
 	continue;
-      
+      /* XXX Each thread maintains a list of extra clauses. Since its
+       * indexed by threadid, it seems to be a global structure. Even
+       * better for MPI. No thread local storage? Cache locality? 
+       */
       int head = headExtraClauses[t][id];
       int tail = tailExtraClauses[t][id];
       if(head == tail) 
-	continue;
+	  continue; //XX : Nothing to share 
       
       int end = tail; 
-      if(tail < head) end = MAX_EXTRA_CLAUSES;
+      if(tail < head)
+	  end = MAX_EXTRA_CLAUSES;
       
       for(int i = head; i < end; i++)
 	addExtraClause(s, t, extraClauses[t][id][i]);
+      //Slurped the clauses
       
-      if(tail < head)
+      if(tail < head)  //Circular buffer, yo.
 	for(int i = 0; i < tail; i++)
 	  addExtraClause(s, t, extraClauses[t][id][i]);
       
       head = tail;
-      if(head == MAX_EXTRA_CLAUSES) head = 0;
+      if(head == MAX_EXTRA_CLAUSES)
+	  head = 0;
       headExtraClauses[t][id] = head;
     }
-  }    
+  }
 
 	
   /*_________________________________________________________________________________________________
@@ -253,7 +259,7 @@ namespace Minisat {
     |  watch it correctly, test basic cases distinguich other cases during watching process 
     |________________________________________________________________________________________________@*/
   
-  
+  //Local procedure for adding slurped clauses into the local solver. 
   void Cooperation::addExtraClause(Solver* s, int t, Lit* lt){
     
     vec<Lit>  extra_clause;           

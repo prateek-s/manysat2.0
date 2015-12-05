@@ -31,12 +31,13 @@ lbool Solver::importClauses(Cooperation* coop) {
 
 
   switch(deterministic_mode){
-
+      //XXX Non-deterministic mode seems easiest? 
   case 0:   // non deterministic case
     {
       for(int t = 0; t < coop->nThreads(); t++)
 	if(coop->answer(t) != l_Undef)
 	  return coop->answer(t);
+      //XXX A thread has found an answer. Broadcast via MPI. Maybe in calling function.
       
       coop->importExtraClauses(this);
       coop->importExtraUnits(this, extraUnits);

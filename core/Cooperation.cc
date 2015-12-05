@@ -151,7 +151,9 @@ namespace Minisat {
     |  Description: each time a new clause is learnt, it is exported to other threads
     |________________________________________________________________________________________________@*/
   
-  
+  //XXX Export is called by solver.cc directly. Seems like a push mechanism?
+    //XXX Why  both import and export?
+    //XXX What does this do? 
   void Cooperation::exportExtraClause(Solver* s, vec<Lit>& learnt){
     
     int id = s->threadId;
@@ -170,12 +172,14 @@ namespace Minisat {
       
       for(int j = 0; j < learnt.size(); j++)
 	extraClauses[id][t][ind][j + 1] = learnt[j];
+      // copy all learnt clauses to this extra clauses buffer . What is that?
       
       ind++;
-      if(ind == MAX_EXTRA_CLAUSES) ind = 0;
+      if(ind == MAX_EXTRA_CLAUSES)
+	  ind = 0;
       tailExtraClauses[id][t] = ind;
     }
-  }		      
+  }
   
   
   /*_________________________________________________________________________________________________

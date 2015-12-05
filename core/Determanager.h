@@ -23,7 +23,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 //=================================================================================================
 
 using namespace Minisat;
-
+//called only once by solver immediately after export
 lbool Solver::importClauses(Cooperation* coop) {
   
   //Control the limit size clause export

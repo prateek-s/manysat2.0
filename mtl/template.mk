@@ -18,12 +18,12 @@ PCOBJS     = $(addsuffix p,  $(COBJS))
 DCOBJS     = $(addsuffix d,  $(COBJS))
 RCOBJS     = $(addsuffix r,  $(COBJS))
 
-
-CXX       ?= g++
+## was g++ 
+CXX       := mpiCC
 CFLAGS    ?= -Wall -Wno-parentheses
 LFLAGS    ?= -Wall
 
-COPTIMIZE ?= -O3
+COPTIMIZE ?= -O1
 
 CFLAGS    += -I$(MROOT) -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS
 LFLAGS    += -lz

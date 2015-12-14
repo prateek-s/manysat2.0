@@ -17,7 +17,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *******************************************************************************************/
 #include "core/Cooperation.h"
-
+#include "core/msg.h"
 
 namespace Minisat {
   
@@ -39,6 +39,8 @@ namespace Minisat {
       
       extraUnits[id][t][ind++].x = unit.x;
       //XX:MPI_PUSH
+      msg_send(0);
+      //mpi_init(3,"foo") ;
       if(ind == MAX_EXTRA_UNITS) ind = 0;
       tailExtraUnits[id][t] = ind;
     }

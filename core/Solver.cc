@@ -166,9 +166,11 @@ void Solver::attachClause(CRef cr) {
     assert(c.size() > 1);
     watches[~c[0]].push(Watcher(cr, c[1]));
     watches[~c[1]].push(Watcher(cr, c[0]));
-    if (c.learnt()) learnts_literals += c.size();
-    else            clauses_literals += c.size(); }
-
+    if (c.learnt())
+	learnts_literals += c.size();
+    else
+	clauses_literals += c.size();
+}
 
 void Solver::detachClause(CRef cr, bool strict) {
     const Clause& c = ca[cr];

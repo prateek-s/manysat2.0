@@ -151,7 +151,7 @@ namespace Minisat {
     |  Description: each time a new clause is learnt, it is exported to other threads
     |________________________________________________________________________________________________@*/
   
-  //XXX Export is called by solver.cc directly. Seems like a push mechanism?
+    //XXX Export is called by solver.cc directly. Seems like a push mechanism?
     //XXX Why  both import and export?
     //XXX What does this do? 
   void Cooperation::exportExtraClause(Solver* s, vec<Lit>& learnt){
@@ -193,7 +193,7 @@ namespace Minisat {
     int id = s->threadId;
     
     for(int t = 0; t < nbThreads; t++){
-      
+	//XXX MPI PUSH HERE?
       if((t == id) || (c.size() > pairwiseLimitExportClauses[id][t])) 
 	continue;
       
@@ -348,7 +348,7 @@ namespace Minisat {
     |  Description: watch lits correctly and testing basic cases and
     |  build a clause from the learnt Extra Lit* 
     |________________________________________________________________________________________________@*/
-  
+  //XXX Not called by anyone?! Ignore?!?
   void Cooperation::addExtraClause1(Solver* s, int t, Lit* lt){
     
     int id = s->threadId;
@@ -399,7 +399,7 @@ namespace Minisat {
     |  addExtraClause : ()  ->  [void]
     |  Description: build a clause from the learnt Extra Lit*
     |________________________________________________________________________________________________@*/
-  
+  //XXX Not called by anyone?!
   void Cooperation::addExtraClause2(Solver* s, int t, Lit* lt){
     
     int id = s->threadId;

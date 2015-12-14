@@ -448,13 +448,14 @@ void Solver::uncheckedEnqueue(Lit p, CRef from)
  |    Post-conditions:
  |      * the propagation queue is empty, even if there was a conflict.
  |________________________________________________________________________________________________@*/
+//XXX does this propagate across threads? Seems to be thread local
 CRef Solver::propagate()
 {
     CRef    confl     = CRef_Undef;
     int     num_props = 0;
     watches.cleanAll();
 	
-    while (qhead < trail.size()){
+    while (qhead < trail.size()) {
         Lit            p   = trail[qhead++];     // 'p' is enqueued fact to propagate.
         vec<Watcher>&  ws  = watches[p];
         Watcher        *i, *j, *end;
@@ -483,12 +484,13 @@ CRef Solver::propagate()
                 *j++ = w; continue; }
 			
             // Look for new watch:
-			for (int k = 2; k < c.size(); k++)
+	    for (int k = 2; k < c.size(); k++)
                 if (value(c[k]) != l_False){
                     c[1] = c[k]; c[k] = false_lit;
                     watches[~c[1]].push(w);
-					
-					goto NextClause; }
+		    
+		    goto NextClause;
+		}
 			
             // Did not find watch -- clause is unit under assignment:
             *j++ = w;
@@ -498,9 +500,9 @@ CRef Solver::propagate()
                 // Copy the remaining watches:
                 while (i < end)
                     *j++ = *i++;
-            }else
+            } else
                 uncheckedEnqueue(first, cr);
-			
+	    // Oh god what syntax is this 
         NextClause:;
         }
         ws.shrink(i - j);
@@ -683,10 +685,14 @@ lbool Solver::search(int nof_conflicts, Cooperation* coop)
 	    /* <Cooperation */ 
 	switchMode:
 	    //export learnt clause wrt to size limit condition
+	    // XXX export learnt clause
 	    exportClause(coop, learnt_clause);
 	    //Coopreation- switch deterministic mode barrier or not
+	    // XXX import clause 
 	    answer = importClauses(coop);
-	    if(answer != l_Undef) return answer;
+	    // returns answer if some thread has found one, else l_Undef
+	    if(answer != l_Undef)
+		return answer;
 	    /* Cooperation> */	
 
         }else{
@@ -737,8 +743,8 @@ lbool Solver::search(int nof_conflicts, Cooperation* coop)
             // Increase decision level and enqueue 'next'
             newDecisionLevel();
             uncheckedEnqueue(next);
-        }
-    }
+        } // NO CONFLICT
+    }   // Infinite For loop
 }
 
 

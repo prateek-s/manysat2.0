@@ -220,8 +220,9 @@ int main(int argc, char** argv)
 	  int t = omp_get_thread_num();
 	  coop.start = true; 
 	  ret = coop.solvers[t].solveLimited(dummy, &coop);
+	  //XXX Spawn the MPI thread here!
 	}
-	
+	// XXX This is a barrier
 	// select winner threads with respect to deterministic mode 
 	for(int t = 0; t < coop.nThreads(); t++)
 	  if(coop.answer(t) != l_Undef){

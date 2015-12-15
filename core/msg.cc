@@ -13,38 +13,29 @@
 #include <fcntl.h>
 #include <endian.h>
 #include <iostream>
-//MPI STUFF? 
+#include <vector>
+#include <mutex>
 
 //Need to maintain some buffer of clauses rcvd but not yet pushed here.. ? 
 
 using namespace Minisat;
 
-int mpi_init(int argc, char* argv[])
-{
-  /* int rank, size; */
- 
-  /* MPI_Init (&argc, &argv);      /\* starts MPI *\/ */
-  /* MPI_Comm_rank (MPI_COMM_WORLD, &rank);        /\* get current process id *\/ */
-  /* MPI_Comm_size (MPI_COMM_WORLD, &size);        /\* get number of processes *\/ */
-  /* printf( "Hello world from process %d of %d\n", rank, size ); */
-  /* MPI_Finalize(); */
-  return 0;
-}
+std::vector<Lit> remote_units ;
+std::vector<std::vector<Lit> > remote_clauses ;
+std::mutex pull_mutex ;
 
+//myaddr
+//broadcast-list 
 
-int msg_send(int from, int lit)
-{
-    //MPI_Init(NULL, NULL) ;
-    //Should be a non-blocking send since its called from coop:exportunit
-    //MPI broadcast or send? can be MPI_Int maybe
-    //printf("msg_send[%d]: %d\n", from, lit);
-    //for loop which sends via all sockets, yes!
-    return 0;
-}
 
 //Should just return the literal 
 int msg_recv()
 {
+    pull_mutex.lock() ;
+    //size,clause
+    //Add to separate unit and clause vectors
+    //When pull from remote is called, then
+    pull_mutex.unlock() ;
     return 0; 
 }
 
@@ -52,6 +43,18 @@ int msg_recv()
 int pull_from_remote(int tid)
 {
     //Separate handling of Unit and non-unit clauses. Icky....
+    pull_mutex.lock() ;
+    while (remote_units.size() > 1) {
+    //slurp from this by popping
+	Lit unit = remote_units.back();
+	remote_units.pop_back() ;
+    //do something with it!
+    }
+    //TODO: convert from std::vector to vec below. 
+    std::vector<Lit> clause = remote_clauses.back() ;
+    remote_clauses.pop_back();
+    
+    pull_mutex.unlock() ;
     
 }
 

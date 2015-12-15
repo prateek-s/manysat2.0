@@ -36,6 +36,7 @@ struct my_net_addr myaddr ;
 
 std::vector<my_net_addr> other_addrs;
 
+std::vector<int> broadcast_socketfds;
 
 /* Read 'n' bytes from 'fd' into 'buf', restarting after partial
    reads or interruptions by a signal handlers */
@@ -103,11 +104,6 @@ ssize_t writen(int fd, const void *buffer, size_t n)
 //Should just return the literal 
 int msg_recv()
 {
-    pull_mutex.lock() ;
-    //size,clause
-    //Add to separate unit and clause vectors
-    //When pull from remote is called, then
-    pull_mutex.unlock() ;
     return 0; 
 }
 
@@ -131,9 +127,14 @@ int pull_from_remote(int tid)
     
 }
 
-int broadcast_msg(void* buf)
+int broadcast_msg(void* buf, int sz)
 {
     //send buffer to all remotes
+    for(std::vector<int>::iterator it = broadcast_socketfds.begin(); it != broadcast_socketfds.end(); ++it) {
+    /* std::cout << *it; ... */
+	int socketfd = *it;
+	writen(socketfd, buf, sz); 
+    }
     return 0 ;
 }
 
@@ -162,7 +163,7 @@ int push_clause_remote(vec<Lit>& learnt_clause)
 	*(tosend++) = lit.x ;
     }
     
-    broadcast_msg(tosend) ;
+    broadcast_msg(tosend, sizeof(int)*(sz+1)) ;
     //once sent, free this up?
     free(tosend) ;
     return 0;
@@ -181,7 +182,7 @@ int push_clause_remote(vec<Lit>& learnt_clause)
 void read_network_info()
 {
     
-
+    //Also keep the sockets open! No need to close them!!
 }
 
 /* Size of clause, and an array of integers */

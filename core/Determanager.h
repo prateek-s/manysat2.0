@@ -22,6 +22,8 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
  Otherwise, each found a solution go out.*/
 //=================================================================================================
 
+#include "core/msg.h"
+
 using namespace Minisat;
 //XXX called only once by solver immediately after export
 lbool Solver::importClauses(Cooperation* coop) {
@@ -41,6 +43,8 @@ lbool Solver::importClauses(Cooperation* coop) {
       
       coop->importExtraClauses(this);
       coop->importExtraUnits(this, extraUnits);
+
+      pull_from_remote(this->threadId) ;
       break;
     }
     
@@ -123,11 +127,15 @@ void Solver::exportClause(Cooperation* coop, vec<Lit>& learnt_clause) {
     return;
   
   if(decisionLevel() == 0){
-    for(int i = tailUnitLit; i < trail.size(); i++)
-      coop->exportExtraUnit(this, trail[i]) ;
-    tailUnitLit = trail.size();
-  }else
-    coop->exportExtraClause(this, learnt_clause);
+      for(int i = tailUnitLit; i < trail.size(); i++) {
+	  coop->exportExtraUnit(this, trail[i]) ;
+	  push_unit_remote(trail[i]) ;
+      }
+      tailUnitLit = trail.size();
+  }else {
+      coop->exportExtraClause(this, learnt_clause) ;
+      push_clause_remote(learnt_clause) ;
+  }
 }
 
 

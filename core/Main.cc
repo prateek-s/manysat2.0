@@ -219,8 +219,9 @@ int main(int argc, char** argv)
 	{
 
 	    int t = omp_get_thread_num();
-	    if(t==0) {
+	    if(t==nbThreads) {
 		msg_main_loop() ;
+		//This starves one thread, but what the heck. 
 	    }
 	    coop.start = true; 
 	    ret = coop.solvers[t].solveLimited(dummy, &coop);

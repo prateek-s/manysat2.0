@@ -17,7 +17,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *******************************************************************************************/
 #include "core/Cooperation.h"
-#include "core/msg.h"
+//#include "core/msg.h"
 
 namespace Minisat {
   
@@ -26,11 +26,12 @@ namespace Minisat {
     |  exportExtraUnit : ()  ->  [void]
     |  Description : manage export Extra Unit Clauses. Called from Determanager.h 
     |________________________________________________________________________________________________@*/
-  
+  //ExportUnit just inserts data directly into the shared datastructure. No corresponding import?
+    //called from determanager.h exportclause level-0
   void Cooperation::exportExtraUnit(Solver* s, Lit unit){
     
     int id = s->threadId; /* Current (this) solver thread */
-    
+    //the last thread == nbThreads is the one which runs the socket.
     for(int t = 0; t < nbThreads; t++){
       
       if(t == id) continue;
@@ -52,7 +53,7 @@ namespace Minisat {
     |  importExtraUnits : ()  ->  [void]
     |  Description : store unit extra clause in the vector unit_learnts
     |________________________________________________________________________________________________@*/
-  
+  //Actually operates on a Clause, and not literals???? 
   void Cooperation::importExtraUnits(Solver* s, vec<Lit>& unit_learnts){ 
     
     int id = s->threadId;
@@ -181,7 +182,7 @@ namespace Minisat {
       int ind = tailExtraClauses[id][t];
       if(((ind+1) % MAX_EXTRA_CLAUSES) == headExtraClauses[id][t]) 
 	continue;
-      
+      //Create a new clause from the vector
       extraClauses[id][t][ind]    = new Lit [learnt.size() + 1];
       extraClauses[id][t][ind][0] = mkLit(learnt.size());
       
@@ -233,7 +234,7 @@ namespace Minisat {
     |  importExtraClauses : ()  ->  [void]
     |  Description: import Extra clauses sent from other threads
     |_______________________________________________________________________________________________@*/
-  
+  //calls addExtraClause
   void Cooperation::importExtraClauses(Solver* s){
     
     int id = s->threadId;

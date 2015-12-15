@@ -35,6 +35,12 @@
 
 \section{ManySAT}
 
+\subsection{ManySAT Implementation}
+
+Literals are just integers. such that p,not p are adjacent in ordering. 
+variables are plain integers. p.x = var+var+(int)sign
+var(p) = p.x>>1 (divide by 2). sign = last bit 
+
 \subsection{Experiment Platform}
 Experiment setup
 

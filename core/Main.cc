@@ -29,7 +29,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "utils/Options.h"
 #include "core/Dimacs.h"
 #include "core/Solver.h"
-
+#include "core/msg.h"
 
 using namespace Minisat;
 
@@ -214,12 +214,19 @@ int main(int argc, char** argv)
 	lbool result;
 	
 	// launch threads in Parallel 	
-	omp_set_num_threads(nbThreads);
+	omp_set_num_threads(nbThreads+1);
 #pragma omp parallel
 	{
 	  int t = omp_get_thread_num();
-	  coop.start = true; 
-	  ret = coop.solvers[t].solveLimited(dummy, &coop);
+	  if (t == nbThreads+1) {
+	      printf("New thread here \n") ;
+	      //Run the msg broadcast/recv service?
+	      //msg.start()
+	  }
+	  else {
+	      coop.start = true; 
+	      ret = coop.solvers[t].solveLimited(dummy, &coop);
+	  }
 	  //XXX Spawn the MPI thread here!
 	}
 	// XXX This is a barrier

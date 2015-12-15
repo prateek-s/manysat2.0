@@ -428,10 +428,13 @@ void Solver::analyzeFinal(Lit p, vec<Lit>& out_conflict)
     seen[var(p)] = 0;
 }
 
-
+// The from is a default argument set to undefined
+// Can C++ even do that?
 void Solver::uncheckedEnqueue(Lit p, CRef from)
 {
     assert(value(p) == l_Undef);
+    //This assert might fail when getting literals from other machines lazily????
+    //assert seems strong anyway?
     assigns[var(p)] = lbool(!sign(p));
     vardata[var(p)] = mkVarData(from, decisionLevel());
     trail.push_(p);

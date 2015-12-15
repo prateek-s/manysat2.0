@@ -39,11 +39,12 @@ namespace Minisat {
       
       extraUnits[id][t][ind++].x = unit.x;
       //XX:MPI_PUSH
-      msg_send(0);
       //mpi_init(3,"foo") ;
       if(ind == MAX_EXTRA_UNITS) ind = 0;
       tailExtraUnits[id][t] = ind;
     }
+    //First update local threads, then send to other machines
+    msg_send(id, unit.x);
   }
 
   /*_________________________________________________________________________________________________
@@ -69,6 +70,7 @@ namespace Minisat {
       int end = tail; 
       if(tail < head) end = MAX_EXTRA_UNITS;
       
+      //storeExtraUnits is just unit_learnts.push(i) 
       for(int i = head; i < end; i++)
 	storeExtraUnits(s, t, extraUnits[t][id][i], unit_learnts);
       
@@ -80,6 +82,10 @@ namespace Minisat {
       if(head == MAX_EXTRA_UNITS) head = 0;
       headExtraUnits[t][id] = head;
     }
+//First learn units from other local threads, then call msg_slurp?
+    //t will be nbThreads+1, just what we want
+    //storeExtraUnits(s, t, extraUnits[t][id][i], units_learnt);  //this wont work because unit_learnts is a ref
+    //We need something like solver->uncheckedEnqueue(l) maybe
   }
     
   /*_________________________________________________________________________________________________
@@ -116,6 +122,9 @@ namespace Minisat {
       if(head == MAX_EXTRA_UNITS) head = 0;
       headExtraUnits[t][id] = head;
     }
+    //vec remote_lits = get_remote_units() 
+    //for r in remote_lits : solver->uncheckedEnqueue(r) 
+    
   }
   
   
@@ -131,6 +140,8 @@ namespace Minisat {
     
     if(s->value(l) != l_Undef) return;
     s->uncheckedEnqueue(l);
+    
+    //accounting
     nbImportedExtraUnits[s->threadId]++;
     pairwiseImportedExtraClauses[t][s->threadId]++;
   }
@@ -143,6 +154,8 @@ namespace Minisat {
   
   void Cooperation::storeExtraUnits(Solver* s, int t, Lit l, vec<Lit>& unitLits){
     unitLits.push(l);
+    
+    //accounting
     nbImportedExtraUnits[s->threadId]++;
     pairwiseImportedExtraClauses[t][s->threadId]++;
   }

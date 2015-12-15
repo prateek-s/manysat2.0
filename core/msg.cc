@@ -15,14 +15,86 @@
 #include <iostream>
 #include <vector>
 #include <mutex>
+#include <string>
 
 //Need to maintain some buffer of clauses rcvd but not yet pushed here.. ? 
 
 using namespace Minisat;
 
+struct my_net_addr {
+    std::string addr ;
+    int port ;
+};
+    
+
 std::vector<Lit> remote_units ;
 std::vector<std::vector<Lit> > remote_clauses ;
 std::mutex pull_mutex ;
+
+
+struct my_net_addr myaddr ;
+
+std::vector<my_net_addr> other_addrs;
+
+
+/* Read 'n' bytes from 'fd' into 'buf', restarting after partial
+   reads or interruptions by a signal handlers */
+
+ssize_t readn(int fd, void *buffer, size_t n)
+{
+    ssize_t numRead;                    /* # of bytes fetched by last read() */
+    size_t totRead;                     /* Total # of bytes read so far */
+    char *buf;
+
+    buf = (char*) buffer;                       /* No pointer arithmetic on "void *" */
+    for (totRead = 0; totRead < n; ) {
+        numRead = read(fd, buf, n - totRead);
+
+        if (numRead == 0)               /* EOF */
+            return totRead;             /* May be 0 if this is first read() */
+        if (numRead == -1) {
+            if (errno == EINTR)
+                continue;               /* Interrupted --> restart read() */
+            else
+                return -1;              /* Some other error */
+        }
+        totRead += numRead;
+        buf += numRead;
+    }
+    return totRead;                     /* Must be 'n' bytes if we get here */
+}
+
+/* Write 'n' bytes to 'fd' from 'buf', restarting after partial
+   write or interruptions by a signal handlers */
+
+ssize_t writen(int fd, const void *buffer, size_t n)
+{
+    ssize_t numWritten;                 /* # of bytes written by last write() */
+    size_t totWritten;                  /* Total # of bytes written so far */
+    const char *buf;
+
+    buf = (char*) buffer;                       /* No pointer arithmetic on "void *" */
+    for (totWritten = 0; totWritten < n; ) {
+        numWritten = write(fd, buf, n - totWritten);
+
+        /* The "write() returns 0" case should never happen, but the
+           following ensures that we don't loop forever if it does */
+
+        if (numWritten <= 0) {
+            if (numWritten == -1 && errno == EINTR)
+                continue;               /* Interrupted --> restart write() */
+            else
+                return -1;              /* Some other error */
+        }
+        totWritten += numWritten;
+        buf += numWritten;
+    }
+    return totWritten;                  /* Must be 'n' bytes if we get here */
+}
+
+
+
+//or maybe OpenMP locks http://stackoverflow.com/questions/2396430/how-to-use-lock-in-openmp
 
 //myaddr
 //broadcast-list 
@@ -55,12 +127,14 @@ int pull_from_remote(int tid)
     remote_clauses.pop_back();
     
     pull_mutex.unlock() ;
+    return 0 ;
     
 }
 
 int broadcast_msg(void* buf)
 {
-    //send buffer to all remotes 
+    //send buffer to all remotes
+    return 0 ;
 }
 
 
@@ -70,6 +144,7 @@ int push_unit_remote(Lit unit)
     vec<Lit> uc ;
     uc.push(unit) ;
     push_clause_remote(uc) ;
+    return 0 ;
 }
 
 
@@ -90,6 +165,7 @@ int push_clause_remote(vec<Lit>& learnt_clause)
     broadcast_msg(tosend) ;
     //once sent, free this up?
     free(tosend) ;
+    return 0;
 }
 
 
@@ -101,19 +177,81 @@ int push_clause_remote(vec<Lit>& learnt_clause)
     //
 //}
 
+//read the files and fill in the corresponding structures
+void read_network_info()
+{
+    
+
+}
+
+/* Size of clause, and an array of integers */
+int process_new_clause(int size, int* litbuf)
+{
+    pull_mutex.lock() ;
+    //size,clause
+    //Add to separate unit and clause vectors
+    //When pull from remote is called, then
+    pull_mutex.unlock() ;
+    return 0; 
+}
+
 
 int msg_main_loop()
 {
     printf("----------------- MAIN LOOP CALLED ! \n") ;
     fflush(NULL);
-    //Open sockets via the others and me file
-    //After that, start the sock_recv loop 
-    while(1) {
-	 msg_recv() ; //can/should be blocking?
-	 //socket recv and 
-	//save r in some local vector?
-	//push to local threads later? 
-    }
 
+    read_network_info() ;
+
+    int clause_size ;
+    int max_clause = 1024 ;
+    int* litbuf = (int*)malloc(sizeof(int)*max_clause) ;
+
+    //create and listen on my socket
+    int port = myaddr.port ;
+    int listenfd, connfd = 0 ;
+    int sockid ;
+    struct sockaddr_in client_addr ;
+    socklen_t ca_len ;
+
+    struct sockaddr_in serv_addr ;
+    memset(&serv_addr, '0', sizeof(serv_addr)) ;
+    
+    serv_addr.sin_family = AF_INET ;
+    serv_addr.sin_port = htons(port) ;
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY) ;
+
+    sockid = socket(AF_INET, SOCK_STREAM, 0) ;
+    if(sockid < 0) {
+	printf("cant create socket!\n");
+	return -1 ;
+    }
+    int errbind= bind(sockid, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) ;
+    if(errbind < 0) {
+	printf("cant bind \n");
+	//is bind required? dont exit here
+    }
+    if(listen(sockid, 10) == -1) {
+	printf("cant listen \n");
+	return -1 ;
+    }
+    printf("accept now... \n");
+    int s ;
+    while(1) {
+	s = accept(sockid, (struct sockaddr*) &client_addr, &ca_len);
+	printf("waiting for recv \n") ;
+
+	readn(s, &clause_size, sizeof(int)) ;
+	clause_size = (int) ntohl(clause_size) ;
+	//Now I know how much to read!
+	readn(s, &litbuf, sizeof(int)*clause_size) ;
+   
+	process_new_clause(clause_size, litbuf) ;
+	close(s) ;
+    }
+    //close socket
+    //goto before the accept? after bind, definitely. keep listening as well? 
+
+    return 0;
 }
 

@@ -51,19 +51,44 @@ int msg_recv()
 
 int pull_from_remote(int tid)
 {
-    //Separate handling of Unit and non-unit clauses. Icky.... 
+    //Separate handling of Unit and non-unit clauses. Icky....
+    
 }
+
+int broadcast_msg(void* buf)
+{
+    //send buffer to all remotes 
+}
+
 
 int push_unit_remote(Lit unit)
 {
-
+    //just a msg send after making into byte array and sending?
+    vec<Lit> uc ;
+    uc.push(unit) ;
+    push_clause_remote(uc) ;
 }
 
 
 int push_clause_remote(vec<Lit>& learnt_clause)
 {
-
+    //transform the vector into a suitable byte array and then send
+    int sz = learnt_clause.size() ;
+    int* tosend = (int*) malloc(sizeof(int)*(sz+1));
+    tosend[0] = sz*sizeof(int) ; //this has to be in bytes!
+    tosend = tosend + 1 ;
+    Lit lit ;
+    int x ;
+    for(int i = 0 ; i < sz ; i++) {
+	lit = learnt_clause[i] ;
+	*(tosend++) = lit.x ;
+    }
+    
+    broadcast_msg(tosend) ;
+    //once sent, free this up?
+    free(tosend) ;
 }
+
 
 //vec<Lit> get_remote_units()
 //{

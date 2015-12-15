@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./manysat2.0 -limitEx=$sharing  -ncores=$parallelism $f 1>>../results/$category/$g.out

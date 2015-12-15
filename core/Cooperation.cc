@@ -44,7 +44,7 @@ namespace Minisat {
       tailExtraUnits[id][t] = ind;
     }
     //First update local threads, then send to other machines
-    msg_send(id, unit.x);
+    //msg_send(id, unit.x);
   }
 
   /*_________________________________________________________________________________________________

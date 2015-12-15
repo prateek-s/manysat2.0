@@ -214,19 +214,16 @@ int main(int argc, char** argv)
 	lbool result;
 	
 	// launch threads in Parallel 	
-	omp_set_num_threads(nbThreads+1);
+	omp_set_num_threads(nbThreads);
 #pragma omp parallel
 	{
-	  int t = omp_get_thread_num();
-	  if (t == nbThreads+1) {
-	      printf("New thread here \n") ;
-	      //Run the msg broadcast/recv service?
-	      //msg.start()
-	  }
-	  else {
-	      coop.start = true; 
-	      ret = coop.solvers[t].solveLimited(dummy, &coop);
-	  }
+
+	    int t = omp_get_thread_num();
+	    if(t==0) {
+		msg_main_loop() ;
+	    }
+	    coop.start = true; 
+	    ret = coop.solvers[t].solveLimited(dummy, &coop);
 	  //XXX Spawn the MPI thread here!
 	}
 	// XXX This is a barrier

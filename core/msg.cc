@@ -23,7 +23,7 @@ int msg_send(int from, int lit)
     //MPI_Init(NULL, NULL) ;
     //Should be a non-blocking send since its called from coop:exportunit
     //MPI broadcast or send? can be MPI_Int maybe
-    printf("msg_send[%d]: %d\n", from, lit);
+    //printf("msg_send[%d]: %d\n", from, lit);
     return 0;
 }
 
@@ -44,8 +44,11 @@ int msg_recv()
 
 int msg_main_loop()
 {
+    printf("----------------- MAIN LOOP CALLED ! \n") ;
+    fflush(NULL);
+    
     while(1) {
-	int r = msg_recv() ; //can/should be blocking? 
+	 msg_recv() ; //can/should be blocking? 
 	//save r in some local vector?
 	//push to local threads later? 
     }

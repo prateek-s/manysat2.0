@@ -156,7 +156,7 @@ int process_new_clause(int size, int* litbuf)
 int pull_from_remote(int tid)
 {
     //Separate handling of Unit and non-unit clauses. Icky....
-    pull_mutex.lock() ;
+    pull_lock() ;
     while (remote_units.size() > 1) {
     //slurp from this by popping
 	Lit unit = remote_units.back();
@@ -167,7 +167,7 @@ int pull_from_remote(int tid)
     std::vector<Lit> clause = remote_clauses.back() ;
     remote_clauses.pop_back();
     
-    pull_mutex.unlock() ;
+    pull_unlock() ;
     return 0 ;
     
 }
@@ -178,11 +178,13 @@ int broadcast_msg(void* buf, int sz)
 {
     //mutex lock here? 
     //send buffer to all remotes
+    push_lock();
     for(std::vector<int>::iterator it = broadcast_socketfds.begin(); it != broadcast_socketfds.end(); ++it) {
     /* std::cout << *it; ... */
 	int socketfd = *it;
 	writen(socketfd, buf, sz); 
     }
+    push_unlock(); 
     return 0 ;
 }
 

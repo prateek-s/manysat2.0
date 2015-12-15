@@ -16,10 +16,12 @@
 #include <vector>
 #include <mutex>
 #include <string>
+#include <omp.h>
 
 //Need to maintain some buffer of clauses rcvd but not yet pushed here.. ? 
 
 using namespace Minisat;
+
 
 struct my_net_addr {
     std::string addr ;
@@ -31,6 +33,8 @@ std::vector<Lit> remote_units ;
 std::vector<std::vector<Lit> > remote_clauses ;
 std::mutex pull_mutex ;
 
+omp_lock_t _pull_lock;
+omp_lock_t _push_lock;
 
 struct my_net_addr myaddr ;
 
@@ -40,6 +44,31 @@ std::vector<int> broadcast_socketfds;
 
 /* Read 'n' bytes from 'fd' into 'buf', restarting after partial
    reads or interruptions by a signal handlers */
+
+/*******************************************************************************/
+
+void pull_lock()
+{
+    omp_set_lock(&_pull_lock);
+}
+
+void pull_unlock()
+{
+    omp_unset_lock(&_pull_lock);
+}
+
+
+void push_lock()
+{
+    omp_set_lock(&_push_lock);
+}
+
+void push_unlock()
+{
+    omp_unset_lock(&_push_lock);
+}
+
+/*******************************************************************************/
 
 ssize_t readn(int fd, void *buffer, size_t n)
 {
@@ -93,7 +122,7 @@ ssize_t writen(int fd, const void *buffer, size_t n)
     return totWritten;                  /* Must be 'n' bytes if we get here */
 }
 
-
+/*******************************************************************************/
 
 //or maybe OpenMP locks http://stackoverflow.com/questions/2396430/how-to-use-lock-in-openmp
 
@@ -106,6 +135,22 @@ int msg_recv()
 {
     return 0; 
 }
+
+
+/* Size of clause, and an array of integers */
+int process_new_clause(int size, int* litbuf)
+{
+    pull_lock();
+    //size,clause
+    if(size == 1) {
+//	remote_units.push(mklit(*litbuf));
+    }
+    //Add to separate unit and clause vectors
+    //When pull from remote is called, then
+    pull_unlock();
+    return 0; 
+}
+
 
 
 int pull_from_remote(int tid)
@@ -127,8 +172,11 @@ int pull_from_remote(int tid)
     
 }
 
+/*******************************************************************************/
+
 int broadcast_msg(void* buf, int sz)
 {
+    //mutex lock here? 
     //send buffer to all remotes
     for(std::vector<int>::iterator it = broadcast_socketfds.begin(); it != broadcast_socketfds.end(); ++it) {
     /* std::cout << *it; ... */
@@ -169,6 +217,7 @@ int push_clause_remote(vec<Lit>& learnt_clause)
     return 0;
 }
 
+/*******************************************************************************/
 
 //vec<Lit> get_remote_units()
 //{
@@ -185,22 +234,16 @@ void read_network_info()
     //Also keep the sockets open! No need to close them!!
 }
 
-/* Size of clause, and an array of integers */
-int process_new_clause(int size, int* litbuf)
-{
-    pull_mutex.lock() ;
-    //size,clause
-    //Add to separate unit and clause vectors
-    //When pull from remote is called, then
-    pull_mutex.unlock() ;
-    return 0; 
-}
+/*******************************************************************************/
+
 
 
 int msg_main_loop()
 {
     printf("----------------- MAIN LOOP CALLED ! \n") ;
     fflush(NULL);
+    omp_init_lock(&_pull_lock);
+    omp_init_lock(&_push_lock) ;
 
     read_network_info() ;
 

@@ -371,19 +371,40 @@ dimacs : vars clause ; then the clause themselves one per line
 
 
 
-\section{Related Work}
-
-
-\section{Design}
-
-\subsection{ManySAT Implementation}
-
-Literals are just integers. such that p,not p are adjacent in ordering. 
-variables are plain integers. p.x = var+var+(int)sign
-var(p) = p.x>>1 (divide by 2). sign = last bit 
 
 
 \section{Evaluation}
+
+To evaluate the performance of ManySAT, I used the Sat-Competition
+2014~\cite{sc14} benchmarks. In particular, since SAT solvers are
+usually used for specific applications, I used the ``application''
+benchmarks from the benchmark suite.
+
+
+A major problem with SAT is that many instances require too much
+time. When I ran the full application benchmark suite to sanity-check
+ManySAT, some problems ran for over two days(!). For the rest of the
+experiments, I have used a timeout value of 1000 seconds, and problems
+taking longer than that are terminated. From the full benchmark suite,
+only \textbf{26} problems finished within 100 seconds, and all the
+experiments were performed on each of these 26 problems.
+
+
+The hardware platform used for all the experiments was a Dell
+PowerEdge R210 server with 16GB memory and 8 core Xeon E3-1240 V2
+CPU. This CPU has hyperthreading enabled (thus 8 effective CPUs). Some
+of the experiments were also performed on a newer, 6th generation
+Intel CPU (Core i5-6500) to test whether ManySAT can take advantages
+of the newer architecture and new instruction set. The ManySAT program
+was compiled by GCC with the \texttt{-O3} optimization flag.
+
+
+\textbf{plingeling:} In addition to evaluating my modifications to
+ManySAT, I also compared with plingeling, the parallel version of
+lingeling, which is the 2011 SAT contest winner and a very competitive
+industrial SAT solver. Plingeling is CDCL based, and only shares unit
+clauses.
+
 
 
 \subsection{Experiment Platform}

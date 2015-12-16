@@ -1,0 +1,9 @@
+@article{hamadi2008manysat,
+  title={ManySAT: a parallel SAT solver},
+  author={Hamadi, Youssef and Jabbour, Said and Sais, Lakhdar},
+  journal={Journal on Satisfiability, Boolean Modeling and Computation},
+  volume={6},
+  pages={245--262},
+  year={2008}
+}
+

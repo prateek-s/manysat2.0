@@ -1,0 +1,37 @@
+\begin{thebibliography}{1}
+
+\bibitem{biere2010lingeling}
+Armin Biere.
+\newblock Lingeling, plingeling, picosat and precosat at sat race 2010.
+\newblock {\em FMV Report Series Technical Report}, 10(1), 2010.
+
+\bibitem{chrabakh2003gridsat}
+Wahid Chrabakh and Rich Wolski.
+\newblock Gridsat: A chaff-based distributed sat solver for the grid.
+\newblock In {\em Proceedings of the 2003 ACM/IEEE conference on
+  Supercomputing}, page~37. ACM, 2003.
+
+\bibitem{hamadi2013seven}
+Youssef Hamadi and Christoph Wintersteiger.
+\newblock Seven challenges in parallel sat solving.
+\newblock {\em AI Magazine}, 34(2):99, 2013.
+
+\bibitem{hyvarinen2010partitioning}
+Antti~EJ Hyv{\"a}rinen, Tommi Junttila, and Ilkka Niemel{\"a}.
+\newblock Partitioning sat instances for distributed solving.
+\newblock In {\em Logic for Programming, Artificial Intelligence, and
+  Reasoning}, pages 372--386. Springer, 2010.
+
+\bibitem{lewis2007multithreaded}
+Matthew Lewis, Tobias Schubert, and Bernd Becker.
+\newblock Multithreaded sat solving.
+\newblock In {\em Design Automation Conference, 2007. ASP-DAC'07. Asia and
+  South Pacific}, pages 926--931. IEEE, 2007.
+
+\bibitem{schubert2005pamira}
+Tobias Schubert, Matthew Lewis, and Bernd Becker.
+\newblock Pamira-a parallel sat solver with knowledge sharing.
+\newblock In {\em Microprocessor Test and Verification, 2005. MTV'05. Sixth
+  International Workshop on}, pages 29--36. IEEE, 2005.
+
+\end{thebibliography}

@@ -267,7 +267,50 @@ This ``too many shared clauses'' problem is mitigated by using two techniques:
 \end{enumerate}
 
 
+
+
 \section{Implementation}
+
+dManySAT is implemented by modifying ManySAT, and requires about 500
+lines of C++ code. 
+
+Communication among machines is done over the network by the
+communication threads. Many communication platforms were contemplated,
+tried, and abandoned: MPI, zeroMQ. MPI is the defacto HPC
+communication interface, but sadly proved to be too restrictive when
+combined with ManySAT's existing clause sharing design. The primary
+goal of the implementation was to minimize the amount of changes to
+ManySAT. The solution finally adopted was to use simple BSD TCP
+sockets to send and receive clauses. The communication thread
+maintains a list of open sockets to the other machines (the peers),
+and broadcasts clauses by sending them to all the peers.
+
+
+Since clauses are sent over the network, care it taken to serialize
+them and convert from host to network byte order, etc. ManySAT clauses
+are simply a vector of literals. ManySAT has its own vector
+implementation (not \texttt{std::vector}), which is quite amenable to
+network communication and did not require a serialization library like
+protobufs. A manysat vector is simply an array with the size as the
+first element. Thus, to send a clause, the clause vector is just sent
+over the wire. Unit clauses are represented by literals, which are
+again plain integers. ManySAT uses a single integer to encode both the
+variable and the polarity. Unit literals are converted to unit clauses
+(by prefixing the size=1) and then sent.
+
+
+The communication thread constantly listens on its receive socket, and
+places all clauses on the input buffer. There are separate sockets for
+receiving and broadcasting. The input buffer is filled in by the
+communication thread, and drained by the other solver threads, and is
+protected by an OpenMP mutex. 
+
+
+Exporting a clause implies a message-send, which is simply a socket
+send after converting to a safe binary format. Currently, dManySAT
+broadcasts clauses eagerly without any buffering, which adds to the
+networking overhead. A simple optimization would be to buffer exported
+clauses and send bigger messages.
 
 
 

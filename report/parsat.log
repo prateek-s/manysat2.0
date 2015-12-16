@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2015.12.4)  16 DEC 2015 12:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2015.12.4)  16 DEC 2015 15:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -349,7 +349,11 @@ e
 (/usr/share/texlive/texmf-dist/tex/latex/preprint/balance.sty
 Package: balance 1999/02/23 4.3 (PWD)
 \oldvsize=\dimen128
-) (./parsat.aux)
+) (./parsat.aux
+
+LaTeX Warning: Label `fig:scatter-1' multiply defined.
+
+)
 \openout1 = `parsat.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
@@ -366,8 +370,7 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 27.
 LaTeX Font Info:    ... okay on input line 27.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 27.
 LaTeX Font Info:    Try loading font information for TS1+cmr on input line 27.
-
-(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    ... okay on input line 27.
@@ -459,30 +462,64 @@ File: ../figs/scatter_all.pdf Graphic file (type pdf)
 Package pdftex.def Info: ../figs/scatter_all.pdf used on input line 394.
 (pdftex.def)             Requested size: 375.80542pt x 184.84705pt.
 
-<../figs/boxplot_all.pdf, id=20, 566.59679pt x 349.7868pt>
-File: ../figs/boxplot_all.pdf Graphic file (type pdf)
+<../figs/scatter_cdf.pdf, id=20, 711.13678pt x 349.7868pt>
+File: ../figs/scatter_cdf.pdf Graphic file (type pdf)
 
-<use ../figs/boxplot_all.pdf>
-Package pdftex.def Info: ../figs/boxplot_all.pdf used on input line 401.
+<use ../figs/scatter_cdf.pdf>
+Package pdftex.def Info: ../figs/scatter_cdf.pdf used on input line 402.
+(pdftex.def)             Requested size: 375.80542pt x 184.84705pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../figs/cmp_box.pdf, id=21, 566.59679pt x 349.7868pt>
+File: ../figs/cmp_box.pdf Graphic file (type pdf)
+
+<use ../figs/cmp_box.pdf>
+Package pdftex.def Info: ../figs/cmp_box.pdf used on input line 410.
 (pdftex.def)             Requested size: 375.80542pt x 232.00218pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-(./parsat.bbl [4 <../figs/scatter_all.pdf>]) [5 <../figs/boxplot_all.pdf>]
-(./parsat.aux)
+<../figs/boxplot_all.pdf, id=22, 566.59679pt x 349.7868pt>
+File: ../figs/boxplot_all.pdf Graphic file (type pdf)
+
+<use ../figs/boxplot_all.pdf>
+Package pdftex.def Info: ../figs/boxplot_all.pdf used on input line 417.
+(pdftex.def)             Requested size: 375.80542pt x 232.00218pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../figs/gss-18-s100.pdf, id=23, 587.19376pt x 442.65375pt>
+File: ../figs/gss-18-s100.pdf Graphic file (type pdf)
+
+<use ../figs/gss-18-s100.pdf>
+Package pdftex.def Info: ../figs/gss-18-s100.pdf used on input line 426.
+(pdftex.def)             Requested size: 375.80542pt x 283.29742pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+(./parsat.bbl [4 <../figs/scatter_all.pdf>]) [5 <../figs/scatter_cdf.pdf>]
+[6 <../figs/cmp_box.pdf> <../figs/boxplot_all.pdf
+
+pdfTeX warning: pdflatex (file ../figs/boxplot_all.pdf): PDF inclusion: multipl
+e pdfs with page group included in a single page
+>] [7 <../figs/gss-18-s100.pdf>] (./parsat.aux)
 
 LaTeX Warning: There were undefined references.
 
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 3905 strings out of 495000
- 57695 string characters out of 6181169
- 114295 words of memory out of 5000000
- 7047 multiletter control sequences out of 15000+600000
+ 3923 strings out of 495000
+ 58088 string characters out of 6181169
+ 114342 words of memory out of 5000000
+ 7062 multiletter control sequences out of 15000+600000
  35089 words of font info for 73 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  42i,6n,38p,327b,233s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -493,10 +530,10 @@ fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/tim
 es/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><
 /usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on parsat.pdf (5 pages, 112456 bytes).
+Output written on parsat.pdf (7 pages, 144019 bytes).
 PDF statistics:
- 113 PDF objects out of 1000 (max. 8388607)
- 46 compressed objects within 1 object stream
+ 229 PDF objects out of 1000 (max. 8388607)
+ 69 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

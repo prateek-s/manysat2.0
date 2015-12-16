@@ -1,0 +1,3 @@
+
+
+cat $f | awk '/variables/{print ; getline ; print ;}' >> input_results.txt

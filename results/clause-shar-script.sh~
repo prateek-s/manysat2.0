@@ -1,0 +1,3 @@
+
+
+cat t | grep -v "\-\-\-" | sed 's/|//g' | sed 's/x//g' | awk '{print $5,$NF}' | sed 's/threads//g' | awk '{print $1}' |grep . |awk 'NR % 2==1 {o=$0; next} {print o "," $0}'

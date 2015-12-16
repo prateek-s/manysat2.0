@@ -392,21 +392,44 @@ Experiment setup
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{../figs/scatter_all.pdf}
-  \caption{Scatter-plot of running times}
+  \caption{Scatter-plot of running times.}
   \label{fig:scatter-1}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../figs/scatter_cdf.pdf}
+  \caption{CDF of running times of ManySAT with different clause sharing limits}
+  \label{fig:scatter-2}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../figs/cmp_box.pdf}
+  \caption{Effect of clause sharing on ManySAT and plingeling.}
+  \label{fig:cmp-1}
 \end{figure}
 
 \begin{figure}[h]
   \centering
     \includegraphics[width=0.8\textwidth]{../figs/boxplot_all.pdf}
-  \caption{Summary of running times}
+  \caption{Summary of running times. Default clause length of 10 yields best results. Sharing only unit clauses hurts performance significantly.}
   \label{fig:boxplot-1}
 \end{figure}
 
 
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../figs/gss-18-s100.pdf}
+  \caption{Percentage of clauses shared vs running time for gss-18-s100 input}
+  \label{fig:gss}
+\end{figure}
 
-
+average about 11k variables and 60k clauses
+max 53k variables , 161k clauses
 
 \bibliographystyle{plain}
 \bibliography{parsat}

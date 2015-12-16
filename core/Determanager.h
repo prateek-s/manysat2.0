@@ -43,8 +43,11 @@ lbool Solver::importClauses(Cooperation* coop) {
       
       coop->importExtraClauses(this);
       coop->importExtraUnits(this, extraUnits);
-
-      pull_from_remote(this->threadId) ;
+      pull_clauses_from_remote(this, coop, this->threadId) ;
+      /* Lit** t = pull_clauses_from_remote(this->threadId) ; */
+      /* coop->importRemoteClauses(this, t) ; */
+      //extraUnits = pull_units_from_remote(this->threadId) ;
+      //coop->importExtraUnits(this, extraUnits);
       break;
     }
     

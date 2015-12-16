@@ -151,9 +151,14 @@ int process_new_clause(int size, int* litbuf)
     return 0; 
 }
 
+void pull_clauses_from_remote(Solver* s, Cooperation* coop, int tid)
+{
+    vec<Lit> ans ;
+    coop->importRemoteClause(s, ans);
+    
+}
 
-
-int pull_from_remote(int tid)
+vec<Lit> pull_units_from_remote(int tid)
 {
     //Separate handling of Unit and non-unit clauses. Icky....
     pull_lock() ;
@@ -167,8 +172,7 @@ int pull_from_remote(int tid)
     std::vector<Lit> clause = remote_clauses.back() ;
     remote_clauses.pop_back();
     
-    pull_unlock() ;
-    return 0 ;
+    pull_unlock() ;    
     
 }
 

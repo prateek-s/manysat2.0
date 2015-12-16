@@ -16,7 +16,7 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FO
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *******************************************************************************************/
-
+#pragma once 
 #include "core/SolverTypes.h"
 #include "core/Solver.h"
 
@@ -87,6 +87,7 @@ Description:
     void exportExtraClause		(Solver* s, vec<Lit>& learnt);
     void exportExtraClause		(Solver* s, Clause& c);
     void importExtraClauses		(Solver* s);
+    void importRemoteClause(Solver* s, vec<Lit>& clauses) ;
     
     void addExtraClause			(Solver* s, int t, Lit* lt);
     void addExtraClause1		(Solver* s, int t, Lit* lt);

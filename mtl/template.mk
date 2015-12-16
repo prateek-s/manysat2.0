@@ -20,7 +20,7 @@ RCOBJS     = $(addsuffix r,  $(COBJS))
 
 ## was g++ 
 CXX       ?= g++
-CFLAGS    ?= -Wall -Wno-parentheses -pedantic -std=c++11
+CFLAGS    ?= -Wall -Wno-parentheses -std=c++11
 LFLAGS    ?= -Wall
 
 COPTIMIZE ?= -O3

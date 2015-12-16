@@ -47,7 +47,7 @@ namespace Minisat {
     //First update local threads, then send to other machines
     //msg_send(id, unit.x);
   }
-
+ 
   /*_________________________________________________________________________________________________
     |
     |  importExtraUnits : ()  ->  [void]
@@ -228,8 +228,21 @@ namespace Minisat {
       tailExtraClauses[id][t] = ind;
     }
   }		      
-  
-  /*_________________________________________________________________________________________________
+
+
+    void Cooperation::importRemoteClause(Solver* s, vec<Lit>& clause){
+	int id = s->threadId;
+	//Need, an array of literals 
+	for(int t = 0; t < nbThreads; t++) {
+	    //   for(auto &clause: clauses) {
+	    addExtraClause(s, t, clause);
+	    //}	    
+	}
+    }
+    
+
+    
+    /*_________________________________________________________________________________________________
     |
     |  importExtraClauses : ()  ->  [void]
     |  Description: import Extra clauses sent from other threads
@@ -270,6 +283,8 @@ namespace Minisat {
       headExtraClauses[t][id] = head;
     }
   }
+
+    
 
 	
   /*_________________________________________________________________________________________________

@@ -12,13 +12,26 @@
 \usepackage{float}
 \usepackage{epstopdf}
 \usepackage{balance}
+\usepackage{url,hyperref}
+
+\textwidth = 6.5 in
+\textheight = 9 in
+\oddsidemargin = 0.0 in
+\evensidemargin = 0.0 in
+\topmargin = 0.0 in			 
+\headheight = 0.0 in			
+\headsep = 0.0 in
+			
+\parskip = 0.1in	
+			% vertical space between paragraphs
+% Delete the % in the following line if you don't want to have the first line of every paragraph indented
+%\parindent = 0.0in
 
 
-
-\setlength{\textwidth}{6.5in}
-\setlength{\textheight}{9.50in}
-\setlength{\oddsidemargin}{-.19in}
-\voffset=-1.0in
+%\setlength{\textwidth}{6.0in}
+%\setlength{\textheight}{9.50in}
+%\setlength{\oddsidemargin}{-.25in}
+%\voffset=-1.0in
 
 \title{CS 690LG Project: Distributed SAT Solving}
 \author{Prateek Sharma}
@@ -54,19 +67,19 @@ The large computation time required to solve SAT instances has been
 conveniently provided by Moore's law and Dennard Scaling, which
 resulted in faster clockspeed. However, recent hardware architectures
 have strongly veered towards more parallelism in the CPUs (via
-multiple CPU cores), and larger clusters of commodity hardware. This
-means that computationally intensive tasks now have to be performed in
-a distributed manner. The ubiquity and low-cost of cloud computing
-services such as Amazon's EC2, where users can launch a cluster of
-1000s of machines in a minute at a very low cost, also means that the
-cloud is a cost-effective platform for computationally intensive tasks
-like SAT solving.
+multiple CPU cores). To make use of multiple CPU cores, recent SAT
+solvers such as plingeling~\cite{plingeling} and
+ManySAT~\cite{manysat} have incorporated multi-threading into
+traditional solvers. For example, ManySAT is a multi-thread version of
+MiniSAT, a well-known single-threaded SAT solver. Multithreaded sat
+solving is fairly well
+studied~\cite{lewis2007multithreaded}.\cite{hamadi2013seven} has a
+good discussion on the challenges in parallel SAT solving.
 
 
-In order to take advantage of clusters of computers, SAT solvers have
-to be distributed. This is not a new challenge, and has received
-significant attention. There are two main techniques that parallel SAT
-solvers use:
+There are two main challenges in parallel SAT solving: problem
+decomposition, and communication. In order to address these
+challenges, there are two main techniques used by parallel SAT solvers:
 
 \begin{enumerate}
 \item \textbf{Portfolio Approach: } Each solver thread operates on the
@@ -82,15 +95,55 @@ solvers use:
   operates on a different search space. Division of the search space
   is non trivial, and balancing the workloads of multiple threads is a
   nuisance in this approach because some threads can be stuck with a
-  ``hard'' portion of the search space.
+  ``hard'' portion of the search space. Partitioning techniques are
+  explored in~\cite{hyvarinen2010partitioning}.
 \end{enumerate}
+
+
+
+Throwing more computing resources at the problem seems to be a viable
+strategy to solve SAT problems, and using all the CPU cores is
+certainly a step in that direction. We can extend this approach, and
+opt to use a cluster of machines instead of a solitary
+machine. Clusters of commodity hardware is the most popular and
+cost-effective option to scale the computing resources. The ubiquity
+and low-cost of cloud computing services such as Amazon's EC2, where
+users can launch a cluster of 1000s of machines in a minute at a very
+low cost, also means that the cloud is a cost-effective platform for
+computationally intensive tasks like SAT solving.
+
+
+
+Thus, cloud platforms which offer clusters on-demand at low costs can
+serve as an ideal platform for distributed SAT solvers. However, there
+are a number of challenges in implementing a fast, distributed
+solver. The primary difference between a parallel SAT solver and a
+distributed solver is that a parallel solver can take advantage of
+shared memory within the machine. That is, all threads have
+low-latency access to shared data-structures such as shared
+clauses. In a cluster, shared state is minimal and slow, and we have
+to rely on some form of message passing. Even if techniques like
+distributed shared memory are used, the networking latency and other
+synchronization overheads make sharing data a much more expensive
+operation when compared to the single machine case. It must be noted
+that these concerns \textbf{also} apply to single machine parallel
+solvers with NUMA architectures, cache-line false sharing, cpu cache
+contention among threads, etc. But they are exacerbated in a
+distributed environment.
+
+Distributed SAT solvers have been around for some time and most of
+them rely on message passing. Examples of such solvers are
+gridsat~\cite{chrabakh2003gridsat}, pasat, and
+paMIRA~\cite{schubert2005pamira}. Some of the performance bottlenecks
+and optimizations for parallel solvers also apply to distributed
+solvers.
 
 
 \subsection{Project Scope \& Contributions}
 
 In this project report, I will study and extend
-ManySAT~\cite{hamadi2008manysat}, a parallel SAT solver. ManySAT is a
-DPLL porfolio based solver which utilizes multiple threads. I will
+ManySAT~\cite{manysat}, a parallel SAT solver. ManySAT is a
+DPLL portfolio based solver which utilizes multiple threads. I will
 show the performance characteristics of ManySAT on SAT benchmarks, and
 compare it to a recent world-champion solver,
 plingeling~\cite{plingeling}.
@@ -105,7 +158,7 @@ version, along with preliminary performance results.
 
 \section{Background: ManySAT}
 
-ManySAT is a DPLL (backtracking) based solver which spwans mulitple
+ManySAT is a DPLL (backtracking) based solver which spawns multiple
 threads, all attacking the same search space. Each thread, however,
 has different heuristics, which enable the search to proceed in
 different order. Below is a description of the various components of the solver:
@@ -272,7 +325,8 @@ This ``too many shared clauses'' problem is mitigated by using two techniques:
 \section{Implementation}
 
 dManySAT is implemented by modifying ManySAT, and requires about 500
-lines of C++ code. 
+lines of C++ code. The code is available on my github
+repository~\cite{github}.
 
 Communication among machines is done over the network by the
 communication threads. Many communication platforms were contemplated,
@@ -314,62 +368,36 @@ clauses and send bigger messages.
 
 
 
-general theorem proving, comp bio, verification. efficiency gains 100k var, millions of clauses. algo improvements and better understanding of the structure. 
+% general theorem proving, comp bio, verification. efficiency gains 100k var, millions of clauses. algo improvements and better understanding of the structure. 
 
 
 
-considerably much more advanced and sophisticated
-performance enhancements have been algorithmic (VSIDS, conflict clause learning,..) 
-watched literal lists 
-
-Dist solvers: gridsat~\cite{chrabakh2003gridsat}, pasat, paMIRA~\cite{schubert2005pamira}, 
-
-Multithreaded sat solving~\cite{lewis2007multithreaded}
-
-In many fields from verification to AI, mapped to CNF. All variables
-undefined, then constraint propagation (DPLL) backtracking,
-
-conflict clauses can be exchanged
-
-gridsat used MPI 
-
-ingredients: restarts, branching, conflict analysis, clause db cleaning
-
-all threads working on same proof Solver(sigma) 
-
-clauses are sent as soon as they are learnt . NOT 
-
-UNSAT things too? 
-
-Seven challenges~\cite{hamadi2013seven}. knowledge sharing
-
-partitioning techniques: ~\cite{hyvarinen2010partitioning}
-
-SAT solvers have become powerful tools to tackle problems ranging from
-verification, combinatorial challenges, bitcoin mining, etc.
-
-portfolio: let threads compete 
-
-d and c: divide search space or decompose the formula. Workload balancing is hard 
-
-larger portfolio needs better heuristics and more diverse 
-
-FUTURE: combine manysat and plingeling?
-
-shared knowledge on restarts 
-
-restart policies prevent search from getting stuck 
-
-manysat: pairwise size limits. plingeling only shares unit clauses! plingeling won sat-11
-
-manysat2.0: first decision variables are different, that is all! size 10 and below 
-
-plingeling ~\cite{biere2010lingeling}
-
-dimacs : vars clause ; then the clause themselves one per line 
+% considerably much more advanced and sophisticated
+% performance enhancements have been algorithmic (VSIDS, conflict clause learning,..) 
+% watched literal lists 
 
 
 
+
+
+% In many fields from verification to AI, mapped to CNF. All variables
+% undefined, then constraint propagation (DPLL) backtracking,
+
+% conflict clauses can be exchanged
+
+% gridsat used MPI 
+
+% ingredients: restarts, branching, conflict analysis, clause db cleaning
+
+% all threads working on same proof Solver(sigma) 
+
+% clauses are sent as soon as they are learnt . NOT 
+
+% UNSAT things too? 
+
+. knowledge sharing
+
+partitioning techniques: 
 
 
 
@@ -378,7 +406,7 @@ dimacs : vars clause ; then the clause themselves one per line
 To evaluate the performance of ManySAT, I used the Sat-Competition
 2014~\cite{sc14} benchmarks. In particular, since SAT solvers are
 usually used for specific applications, I used the ``application''
-benchmarks from the benchmark suite.
+benchmarks from the benchmark suite~\cite{sc14-app}.
 
 
 A major problem with SAT is that many instances require too much
@@ -403,7 +431,7 @@ was compiled by GCC with the \texttt{-O3} optimization flag.
 ManySAT, I also compared with plingeling, the parallel version of
 lingeling, which is the 2011 SAT contest winner and a very competitive
 industrial SAT solver. Plingeling is CDCL based, and only shares unit
-clauses.
+clauses among threads.
 
 
 

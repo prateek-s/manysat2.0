@@ -1,6 +1,18 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
-\bibitem{biere2010lingeling}
+\bibitem{github}
+{dManySAT github repository}.
+\newblock \url{http://github.com/prateek-s/manysat2.0/}.
+
+\bibitem{sc14-app}
+{SAT Competition 2014 Application Benchmarks }.
+\newblock \url{http://www.satcompetition.org/2014/files/sc14-app.tar }.
+
+\bibitem{sc14}
+{SAT Competition 2014 Benchmarks }.
+\newblock \url{http://www.satcompetition.org/2014/downloads.shtml }.
+
+\bibitem{plingeling}
 Armin Biere.
 \newblock Lingeling, plingeling, picosat and precosat at sat race 2010.
 \newblock {\em FMV Report Series Technical Report}, 10(1), 2010.
@@ -10,6 +22,12 @@ Wahid Chrabakh and Rich Wolski.
 \newblock Gridsat: A chaff-based distributed sat solver for the grid.
 \newblock In {\em Proceedings of the 2003 ACM/IEEE conference on
   Supercomputing}, page~37. ACM, 2003.
+
+\bibitem{manysat}
+Youssef Hamadi, Said Jabbour, and Lakhdar Sais.
+\newblock Manysat: a parallel sat solver.
+\newblock {\em Journal on Satisfiability, Boolean Modeling and Computation},
+  6:245--262, 2008.
 
 \bibitem{hamadi2013seven}
 Youssef Hamadi and Christoph Wintersteiger.

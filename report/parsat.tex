@@ -151,7 +151,7 @@ plingeling~\cite{plingeling}.
 
 ManySAT is restricted to working on a single machine, and is not
 capable of distributed operation. I will also develop a distributed
-version of ManySAT, called dManySAT, which can utilize a cluster of
+version of ManySAT, called \textbf{dManySAT}, which can utilize a cluster of
 machines. I will show the design and implementation of my distributed
 version, along with preliminary performance results.
 
@@ -165,7 +165,7 @@ different order. Below is a description of the various components of the solver:
 
 \textbf{Input: } ManySAT takes a SAT instance in the DIMACS format as
 the input, along with other solver configuration parameters. The input
-instance is fed to SatElite for pre-processing.
+instance is parsed and fed to SatElite for pre-processing.
 
 
 \textbf{Parallelism: } Parallelism is provided by using multiple
@@ -182,9 +182,17 @@ heuristics for the different threads. For example, different threads
 have different restart and decision variable choosing heuristics
 (VSIDS). However, the recent ManySAT implementation (version 2.0),
 also provides a \emph{deterministic mode} of operation, in which all
-the threads use the same heuristics, except for the decision
-variables. That is, the threads use different decision variables at
-each step in the search.
+the threads use the same heuristics, except for the \emph{first}
+decision variables. That is, the threads use different decision
+variables at the first step of the search, and then all use the same
+heuristic with the same parameters and restart policies. This
+deterministic mode enables better performance comparisons, but at the
+cost of portfolio diversity, which is also crucial for massively
+parallel SAT solvers. However, ManySAT is targetted to parallel
+solving on commodity machines with 4-8 CPU cores. My study of its
+source code leads me to believe that there is a lot of scope for
+improvement, especially by being NUMA and cache-line false-sharing
+aware.
 
 
 \textbf{Restart: } If a thread is ``too deep'' into the search space,
@@ -395,9 +403,6 @@ clauses and send bigger messages.
 
 % UNSAT things too? 
 
-. knowledge sharing
-
-partitioning techniques: 
 
 
 
@@ -415,7 +420,23 @@ ManySAT, some problems ran for over two days(!). For the rest of the
 experiments, I have used a timeout value of 1000 seconds, and problems
 taking longer than that are terminated. From the full benchmark suite,
 only \textbf{26} problems finished within 100 seconds, and all the
-experiments were performed on each of these 26 problems.
+experiments were performed on each of these 26 problems. The summary
+statistics of these 26 problems is shown in
+Table~\ref{tab:input-stats}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}[h]{|c|c|c|}
+\hline
+     & Average & Maximum \\
+\hline
+Variables & 11,000 & 53,000 \\
+Clauses & 60,000 & 161,000 \\
+\hline
+  \end{tabular}
+  \caption{Number of variables and clauses for the 26 input problem instances}
+  \label{tab:input-stats}
+\end{table}
 
 
 The hardware platform used for all the experiments was a Dell
@@ -433,15 +454,25 @@ lingeling, which is the 2011 SAT contest winner and a very competitive
 industrial SAT solver. Plingeling is CDCL based, and only shares unit
 clauses among threads.
 
+\subsection{Clause sharing's effect on performance}
 
+To see the relatation between clause sharing and performance, ManySAT
+was run on the 26 SAT instances and run for a maximum duration of 1000
+seconds. The results are shown in Figure~\ref{fig:scatter-1}. A better
+representation is the CDF of running times, which is shown in
+Figure~\ref{fig:cdf-1}. The boxplot of the running times is shown in
+Figure~\ref{fig:boxplot-1}. Finally, Figure~\ref{fig:gss} shows the
+relation between the percentage of clauses shared (relative to number
+of clauses in the input) to the running time for one particular input
+problem. There doesn't appear to be a clear trend for this particular
+problem instance, but sharing clauses of length upto 10 seems to yield
+the best results overall~\ref{fig:boxplot-1}. 
 
-\subsection{Experiment Platform}
-Experiment setup
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{../figs/scatter_all.pdf}
-  \caption{Scatter-plot of running times.}
+  \caption{Scatter-plot of running times for ManySAT with different clause sharing parameters. The labels indicate the max length of clauses shared between threads.}
   \label{fig:scatter-1}
 \end{figure}
 
@@ -450,15 +481,7 @@ Experiment setup
   \centering
   \includegraphics[width=0.8\textwidth]{../figs/scatter_cdf.pdf}
   \caption{CDF of running times of ManySAT with different clause sharing limits}
-  \label{fig:scatter-2}
-\end{figure}
-
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.8\textwidth]{../figs/cmp_box.pdf}
-  \caption{Effect of clause sharing on ManySAT and plingeling.}
-  \label{fig:cmp-1}
+  \label{fig:cdf-1}
 \end{figure}
 
 \begin{figure}[h]
@@ -477,8 +500,59 @@ Experiment setup
   \label{fig:gss}
 \end{figure}
 
-average about 11k variables and 60k clauses
-max 53k variables , 161k clauses
+\clearpage
+\subsection{Distributed ManySAT performance}
+
+To evaluate distributed ManySAT, it was compared to vanilla ManySAT
+(can only run on a single machine), and plingeling (also on a single
+machine). For dManySAT, two nodes were used with 4 cores each. To
+reduce the effect of network latency, both the nodes were on the same
+physical machine. ManySAT and plingeling used 8 threads, and dManySAT
+used 2 instances with 4 cores each. Thus, the compute resources used
+by all configurations are the same, and in the case of dManySAT, the
+nodes have to use message passing over sockets instead of shared memory. 
+
+The performance is summarized in Figure~\ref{fig:cmp-1}. The distributed
+version of ManySAT is noticeably slower than vanilla ManySAT, and
+plingeling is the fastest of them all, which makes sense because it is
+afterall the world record holder in the SAT competition. This
+experiment was conducted to capture the overhead of TCP-based message
+passing, and the overhead is only moderate. Note that distributed
+ManySAT can increase the computing power available to it by using
+clusters of machines, something which the other local solvers cannot
+do.
+
+
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../figs/cmp_box.pdf}
+  \caption{Distributed ManySAT, ManySAT and plinegling performance. Distributed ManySAT was run with two instances of 4 threads each. ManySAT and plinegling used 8 threads.}
+  \label{fig:cmp-1}
+\end{figure}
+
+
+\clearpage
+
+\section{Conclusions \& Future Work}
+
+In this project, I showed the feasibility of converting a parallel
+solver into a distributed one. Clause sharing is extremely important
+for performance, but too much of it is a bad thing. 
+
+The distributed-ManySAT developed uses message passing between nodes
+to share learnt clauses. The performance of dManySAT is surprisingly
+good, especially given that the implementation is missing some very
+obvious optimizations. As part of future work, buffering learnt
+clauses and batching them to increase message sizes, is the most
+important and crucial step. Replacing standard UNIX sockets by other
+direct hardware access mechanisms (like NetMap) is also a potential
+mechanism to reduce latency and message processing overheads.
+
+A more thorough evaluation of the performance would have been nice,
+but the entire test-suite took about 5 hours to run, which made
+running experiments a time consuming process. 
 
 \bibliographystyle{plain}
 \bibliography{parsat}
